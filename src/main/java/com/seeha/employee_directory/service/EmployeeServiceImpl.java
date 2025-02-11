@@ -1,39 +1,49 @@
 package com.seeha.employee_directory.service;
 
-import com.seeha.employee_directory.dao.EmployeeDAO;
+import com.seeha.employee_directory.dao.EmployeeRepository;
 import com.seeha.employee_directory.entity.Employee;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService{
-    private EmployeeDAO employeeDAO;
+    private EmployeeRepository employeeRepository;
     @Autowired
-    public EmployeeServiceImpl(EmployeeDAO employeeDAO) {
-        this.employeeDAO = employeeDAO;
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
     }
     @Override
     public List<Employee> findAll() {
-        return employeeDAO.findAll();
+        return employeeRepository.findAll();
     }
 
     @Override
     public Employee findById(int id) {
-        return employeeDAO.findById(id);
+        Optional<Employee> result = employeeRepository.findById(id);
+        Employee employee = null;
+        if(result.isPresent()){
+            employee = result.get();
+        }
+        else {
+            throw new RuntimeException("Employee id is not found - " + id);
+        }
+        return employee;
     }
 
-    @Transactional
+    // JpaRepository provide transactional management internally
+//    @Transactional
     @Override
     public Employee save(Employee emp) {
-        return employeeDAO.save(emp);
+        return employeeRepository.save(emp);
     }
 
-    @Transactional
+//    @Transactional
     @Override
     public void delete(int id) {
-        employeeDAO.delete(id);
+        employeeRepository.deleteById(id);
     }
 }
